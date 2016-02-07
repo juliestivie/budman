@@ -1,6 +1,9 @@
 package com.julie.budman;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
@@ -36,6 +39,31 @@ public class BudgetActivity extends AppCompatActivity {
     protected int currentWeek;
     protected int currentMonth;
     protected int currentYear;
+    private final DateChangeReceiver dateReceiver = new DateChangeReceiver();
+
+    public class DateChangeReceiver extends BroadcastReceiver {
+        private BudgetActivity budget;
+
+        @Override
+        public void onReceive(final Context context, Intent intent) {
+            Log.d("DateChangeReceiver", "Time changed");
+            if (this.budget == null) {
+                Log.d("DateChangeReceiver", "cannot update the date");
+                return;
+            }
+            try {
+                this.budget.checkCalendar();
+                this.budget.updateView();
+                this.budget.savePreferences();
+            } catch (Exception e) {
+                Log.e("DateChangeReceiver", "error with the date change");
+            }
+        }
+
+        public void setBudgetActivity(BudgetActivity budget)  {
+            this.budget = budget;
+        }
+    }
 
 
     @Override
@@ -44,6 +72,8 @@ public class BudgetActivity extends AppCompatActivity {
         setContentView(R.layout.activity_budget);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        this.dateReceiver.setBudgetActivity(this);
 
         // get the saved data
         SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.budman_pref_file),
@@ -64,18 +94,37 @@ public class BudgetActivity extends AppCompatActivity {
         this.checkCalendar();
 
         // display
-        TextView text = (TextView) findViewById(R.id.today_expense_sum);
-        ProgressBar bar = (ProgressBar) findViewById(R.id.day_progress_bar);
-        this.updateExpense(0, this.todayExpense, this.dayBudget, text, bar);
-        text = (TextView) findViewById(R.id.week_expense_sum);
-        bar = (ProgressBar) findViewById(R.id.week_progress_bar);
-        this.updateExpense(0, this.weekExpense, this.weekBudget, text, bar);
-        text = (TextView) findViewById(R.id.month_expense_sum);
-        bar = (ProgressBar) findViewById(R.id.month_progress_bar);
-        this.updateExpense(0, this.monthExpense, this.monthBudget, text, bar);
+        this.updateView();
+
     }
 
-    protected void checkCalendar() {
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // register the date receiver
+        registerReceiver(this.dateReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        // try to unregister the date receiver
+        try {
+            unregisterReceiver(this.dateReceiver);
+        } catch (IllegalArgumentException e) {
+            if (e.getMessage().contains("Receiver not registered")) {
+                // Ignore this exception. It's a known bug and is exactly what is desired.
+                //Log.w(TAG,"Tried to unregister the receiver when it's not registered");
+            } else {
+                // unexpected, re-throw
+                throw e;
+            }
+        }
+    }
+
+    public void checkCalendar() {
         Calendar rightNow = Calendar.getInstance();
         int _currentDay = rightNow.get(Calendar.DAY_OF_YEAR);
         int _currentWeek = rightNow.get(Calendar.WEEK_OF_YEAR);
@@ -106,7 +155,7 @@ public class BudgetActivity extends AppCompatActivity {
         this.savePreferences();
     }
 
-    protected void savePreferences() {
+    public void savePreferences() {
         SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.budman_pref_file),
                 this.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
@@ -119,6 +168,43 @@ public class BudgetActivity extends AppCompatActivity {
         editor.putInt(getString(R.string.date_month), this.currentMonth);
         editor.putInt(getString(R.string.date_year), this.currentYear);
         editor.commit();
+    }
+
+    public void updateView() {
+        TextView text;
+        ProgressBar bar;
+        int status = 0;
+
+        // day view
+        text = (TextView) findViewById(R.id.today_expense_sum);
+        text.setText(Float.toString(this.todayExpense));
+
+        bar = (ProgressBar) findViewById(R.id.day_progress_bar);
+        status = Math.round(100 * this.todayExpense / this.dayBudget);
+        if (status > 100)
+            status = 100;
+        bar.setProgress(status);
+
+
+        // update week view
+        text = (TextView) findViewById(R.id.week_expense_sum);
+        text.setText(Float.toString(this.weekExpense));
+
+        bar = (ProgressBar) findViewById(R.id.week_progress_bar);
+        status = Math.round(100 * this.weekExpense / this.weekBudget);
+        if (status > 100)
+            status = 100;
+        bar.setProgress(status);
+
+        // update month view
+        text = (TextView) findViewById(R.id.month_expense_sum);
+        text.setText(Float.toString(this.monthExpense));
+
+        bar = (ProgressBar) findViewById(R.id.month_progress_bar);
+        status = Math.round(100 * this.monthExpense / this.monthBudget);
+        if (status > 100)
+            status = 100;
+        bar.setProgress(status);
     }
 
     @Override
@@ -139,21 +225,12 @@ public class BudgetActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             return true;
         } else if (id == R.id.action_reset) {
-            // reset day expense
+            // reset expenses
             this.todayExpense = 0;
-            TextView text = (TextView) findViewById(R.id.today_expense_sum);
-            ProgressBar bar = (ProgressBar) findViewById(R.id.day_progress_bar);
-            this.updateExpense(0, 0, this.dayBudget, text, bar);
-            // reset week expense
             this.weekExpense = 0;
-            text = (TextView) findViewById(R.id.week_expense_sum);
-            bar = (ProgressBar) findViewById(R.id.week_progress_bar);
-            this.updateExpense(0, 0, this.weekBudget, text, bar);
-            // reset month expense
             this.monthExpense = 0;
-            text = (TextView) findViewById(R.id.month_expense_sum);
-            bar = (ProgressBar) findViewById(R.id.month_progress_bar);
-            this.updateExpense(0, 0, this.monthBudget, text, bar);
+
+            this.updateView();
 
             this.savePreferences();
         }
@@ -161,28 +238,11 @@ public class BudgetActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    protected float updateExpense(float newExpense, float oldExpense, int budget, TextView text, ProgressBar bar) {
-        float expense = oldExpense + newExpense;
-
-        // update text view
-        if (text != null)
-            text.setText(Float.toString(expense));
-
-        // update status bar
-        if (budget == 0)
-            return expense;
-        if (bar != null) {
-            int status = Math.round(expense * 100 / budget);
-            if (status > 100)
-                status = 100;
-            bar.setProgress(status);
-        }
-
-        return expense;
-    }
 
     public void addExpense(View view) {
         float _expense = 0;
+
+        this.checkCalendar();
 
         // get the expense
         EditText editText = (EditText) findViewById(R.id.add_expense);
@@ -208,21 +268,15 @@ public class BudgetActivity extends AppCompatActivity {
         InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         mgr.hideSoftInputFromWindow(editText.getWindowToken(), 0);
 
-        // update day view
-        TextView text = (TextView) findViewById(R.id.today_expense_sum);
-        ProgressBar bar = (ProgressBar) findViewById(R.id.day_progress_bar);
-        this.todayExpense = this.updateExpense(_expense, this.todayExpense, this.dayBudget, text, bar);
+        // update expenses
+        this.todayExpense += _expense;
+        this.weekExpense += _expense;
+        this.monthExpense += _expense;
 
-        // update week view
-        text = (TextView) findViewById(R.id.week_expense_sum);
-        bar = (ProgressBar) findViewById(R.id.week_progress_bar);
-        this.weekExpense = this.updateExpense(_expense, this.weekExpense, this.weekBudget, text, bar);
+        // update view
+        this.updateView();
 
-        // update month view
-        text = (TextView) findViewById(R.id.month_expense_sum);
-        bar = (ProgressBar) findViewById(R.id.month_progress_bar);
-        this.monthExpense = this.updateExpense(_expense, this.monthExpense, this.monthBudget, text, bar);
-
+        // save new data
         this.savePreferences();
     }
 }
