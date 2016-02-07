@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">BudMan</string>
+    <string name="action_settings">Settings</string>
+    <string name="new_expense">New expense</string>
+    <string name="button_ok">OK</string>
+    <string name="today">Today:</string>
+    <string name="week">This week:</string>
+    <string name="month">This month</string>
+</resources>
