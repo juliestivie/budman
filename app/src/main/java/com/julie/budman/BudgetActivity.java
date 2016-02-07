@@ -9,6 +9,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Editable;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -93,10 +94,24 @@ public class BudgetActivity extends AppCompatActivity {
     }
 
     public void addExpense(View view) {
-
+        float _expense = 0;
         EditText editText = (EditText) findViewById(R.id.add_expense);
-        float _expense = Float.valueOf(editText.getText().toString());
+        Editable edit = editText.getText();
+        if (edit == null)
+            return;
+
+        String expense_string = edit.toString();
+        try {
+            _expense = Float.valueOf(expense_string);
+        } catch (Exception e) {
+            editText.setText(null);
+            // hide keyboard
+            InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            mgr.hideSoftInputFromWindow(editText.getWindowToken(), 0);
+            return;
+        }
         editText.setText(null);
+
         // hide keyboard
         InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         mgr.hideSoftInputFromWindow(editText.getWindowToken(), 0);
@@ -104,17 +119,17 @@ public class BudgetActivity extends AppCompatActivity {
         // update day view
         TextView text = (TextView) findViewById(R.id.today_expense_sum);
         ProgressBar bar = (ProgressBar) findViewById(R.id.day_progress_bar);
-        this.todayExpense = updateExpense(_expense, this.todayExpense, this.dayBudget, text, bar);
+        this.todayExpense = this.updateExpense(_expense, this.todayExpense, this.dayBudget, text, bar);
 
         // update week view
         text = (TextView) findViewById(R.id.week_expense_sum);
         bar = (ProgressBar) findViewById(R.id.week_progress_bar);
-        this.weekExpense = updateExpense(_expense, this.weekExpense, this.weekBudget, text, bar);
+        this.weekExpense = this.updateExpense(_expense, this.weekExpense, this.weekBudget, text, bar);
 
         // update month view
         text = (TextView) findViewById(R.id.month_expense_sum);
         bar = (ProgressBar) findViewById(R.id.month_progress_bar);
-        this.monthExpense = updateExpense(_expense, this.monthExpense, this.monthBudget, text, bar);
+        this.monthExpense = this.updateExpense(_expense, this.monthExpense, this.monthBudget, text, bar);
 
 
     }
