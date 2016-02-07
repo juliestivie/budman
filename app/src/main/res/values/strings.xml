@@ -7,4 +7,12 @@
     <string name="week">This week:</string>
     <string name="month">This month</string>
     <string name="balance">Balance:</string>
+    <string name="budman_pref_file">com.julie.budman.data</string>
+    <string name="day_expense">dayExpense</string>
+    <string name="week_expense">weekExpense</string>
+    <string name="month_expense">monthExpense</string>
+    <string name="date_day">DAY</string>
+    <string name="date_week">WEEK</string>
+    <string name="date_month">MONTH</string>
+    <string name="date_year">YEAR</string>
 </resources>
