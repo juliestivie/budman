@@ -14,8 +14,11 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="50px"
         android:layout_marginBottom="100px"
-        android:orientation="vertical"
+        android:layout_marginLeft="100px"
+        android:layout_marginRight="100px"
+        android:orientation="horizontal"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context="com.julie.budman.BudgetActivity"
         tools:showIn="@layout/activity_budget">
@@ -23,11 +26,13 @@
         <EditText
             android:id="@+id/add_expense"
             android:inputType="numberDecimal"
+            android:layout_weight="3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="50px"
+            android:layout_marginRight="20px"
             android:hint="@string/new_expense"
-            android:layout_gravity="center_horizontal" />
+            android:layout_gravity="center_horizontal"
+            android:textSize="30sp"/>
 
         <Button android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -44,6 +49,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:layout_marginLeft="100px"
+    android:layout_marginRight="100px"
     android:id="@+id/today_expense"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
     tools:context="com.julie.budman.BudgetActivity"
@@ -64,8 +71,6 @@
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="50px"
-            android:layout_marginLeft="100px"
-            android:layout_marginRight="100px"
             android:layout_marginBottom="20px"
             android:id="@+id/day_progress_bar"
             android:layout_gravity="center_horizontal"/>
@@ -77,6 +82,8 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="100px"
+        android:layout_marginRight="100px"
         android:orientation="vertical"
         android:id="@+id/week_expense"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -99,8 +106,6 @@
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="50px"
-            android:layout_marginLeft="100px"
-            android:layout_marginRight="100px"
             android:layout_marginBottom="20px"
             android:id="@+id/week_progress_bar"
             android:layout_gravity="center_horizontal"/>
@@ -112,6 +117,8 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="100px"
+        android:layout_marginRight="100px"
         android:orientation="vertical"
         android:id="@+id/month_expense"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -133,8 +140,6 @@
             style="@android:style/Widget.ProgressBar.Horizontal"
             android:layout_width="match_parent"
             android:layout_height="50px"
-            android:layout_marginLeft="100px"
-            android:layout_marginRight="100px"
             android:layout_marginBottom="20px"
             android:id="@+id/month_progress_bar"
             android:layout_gravity="center_horizontal"/>
