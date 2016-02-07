@@ -6,4 +6,5 @@
     <string name="today">Today:</string>
     <string name="week">This week:</string>
     <string name="month">This month</string>
+    <string name="balance">Balance:</string>
 </resources>
