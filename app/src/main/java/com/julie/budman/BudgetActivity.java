@@ -15,6 +15,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Editable;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -78,6 +79,22 @@ public class BudgetActivity extends AppCompatActivity {
         // get the saved data
         SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.budman_pref_file),
                 this.MODE_PRIVATE);
+
+        // add a listener to the edit view
+        EditText text = (EditText) findViewById(R.id.add_expense);
+        text.setOnKeyListener(new View.OnKeyListener() {
+            public boolean onKey(View v, int keyCode, KeyEvent event) {
+                // If the event is a key-down event on the "enter" button
+                Log.d(TAG, "key event");
+                if (keyCode == KeyEvent.KEYCODE_ENTER) {
+                    // Perform action on key press
+                    Log.d(TAG, "calling on click method");
+                    addExpense(v);
+                    return true;
+                }
+                return false;
+            }
+        });
 
         this.todayExpense = sharedPref.getFloat(getString(R.string.day_expense), 0);
         this.weekExpense = sharedPref.getFloat(getString(R.string.week_expense), 0);
