@@ -80,8 +80,11 @@ public class BudgetActivity extends AppCompatActivity {
         SharedPreferences sharedPref = this.getSharedPreferences(getString(R.string.budman_pref_file),
                 this.MODE_PRIVATE);
 
-        // add a listener to the edit view
+
         EditText text = (EditText) findViewById(R.id.add_expense);
+        // add a filter to avoid the user to enter a amount with more than 2 digits after the coma
+        text.setFilters(new InputFilter[] {new DecimalDigitsInputFilter(5,2)});
+        // add a listener to the edit view
         text.setOnKeyListener(new View.OnKeyListener() {
             public boolean onKey(View v, int keyCode, KeyEvent event) {
                 // If the event is a key-down event on the "enter" button
